@@ -7,6 +7,8 @@ namespace MusicStore.Services
         public SongDto Generate(int index, int page, string language, long seed, double avgLikes)
         {
             var random = SeedService.Create(seed, page, index);
+
+            Randomizer.Seed = random;
             var faker = new Faker(language == "ru" ? "ru" : "en");
 
             return new SongDto
