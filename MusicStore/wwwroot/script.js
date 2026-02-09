@@ -202,8 +202,13 @@ toggleViewBtn.addEventListener('click', () => {
     } else {
         viewMode = VIEW.TABLE;
         toggleViewBtn.textContent = 'Gallery';
+
         galleryEl.classList.add('hidden');
         tableEl.classList.remove('hidden');
+
+        document.body.style.height = 'auto';
+        document.documentElement.style.height = 'auto';
+        window.scrollTo(0, 0);
 
         resetAndReload();
     }
