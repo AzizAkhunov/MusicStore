@@ -1,0 +1,54 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>Music Store</title>
+    <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+    <div class="toolbar">
+        <select id="language">
+            <option value="en">English (US)</option>
+            <option value="ru">Russian (RU)</option>
+        </select>
+
+        <input type="number" id="seed" value="1" placeholder="Seed" />
+
+        <button id="randomSeed">Random Seed</button>
+
+        <input type="number" step="0.1" id="likes" value="0" placeholder="Avg likes" />
+
+        <button id="toggleView">Gallery</button>
+    </div>
+
+    <div id="content">
+        <table id="songsTable">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Title</th>
+                    <th>Artist</th>
+                    <th>Album</th>
+                    <th>Genre</th>
+                    <th>Likes</th>
+                    <th>Play</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+        <div id="content">
+            <table id="songsTable">...</table>
+
+            <div id="gallery" class="gallery hidden"></div>
+        </div>
+        <div class="pagination">
+            <button id="prevPage">Prev</button>
+            <span id="pageInfo"></span>
+            <button id="nextPage">Next</button>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
