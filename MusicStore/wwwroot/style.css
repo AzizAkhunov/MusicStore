@@ -86,3 +86,7 @@ button:hover {
 audio {
     width: 100%;
 }
+
+.gallery.hidden {
+    display: none;
+}
