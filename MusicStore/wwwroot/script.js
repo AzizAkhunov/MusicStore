@@ -16,7 +16,6 @@ let state = {
 let viewMode = VIEW.TABLE;
 let isLoading = false;
 
-
 const languageSelect = document.getElementById('language');
 const seedInput = document.getElementById('seed');
 const likesInput = document.getElementById('likes');
@@ -41,6 +40,7 @@ function buildSongsUrl() {
         `&pageSize=${state.pageSize}` +
         `&avgLikes=${state.avgLikes}`;
 }
+
 
 async function loadSongs() {
     if (isLoading) return;
@@ -68,7 +68,9 @@ function renderTable(songs) {
             <td>${song.album}</td>
             <td>${song.genre}</td>
             <td>${song.likes}</td>
-            <td><button class="toggle">Details</button></td>
+            <td class="accordion-cell">
+                <span class="accordion-icon">▶</span>
+            </td>
         `;
 
         const detailsRow = document.createElement('tr');
@@ -79,6 +81,7 @@ function renderTable(songs) {
             <td colspan="7">
                 <div class="details">
                     <strong>${song.title}</strong> — ${song.artist}<br/><br/>
+                    <img src="/api/songs/${song.index}/cover?seed=${state.seed}"width="120" height="120" style="display:block;margin-bottom:10px;"/>
                     <audio controls preload="none">
                         <source src="${API_BASE}${song.audioUrl}?seed=${state.seed}" type="audio/wav">
                     </audio>
@@ -86,16 +89,17 @@ function renderTable(songs) {
             </td>
         `;
 
-        tr.querySelector('.toggle').addEventListener('click', () => {
-            detailsRow.style.display =
-                detailsRow.style.display === 'table-row' ? 'none' : 'table-row';
+        const icon = tr.querySelector('.accordion-icon');
+        icon.addEventListener('click', () => {
+            const opened = detailsRow.style.display === 'table-row';
+            detailsRow.style.display = opened ? 'none' : 'table-row';
+            icon.textContent = opened ? '▶' : '▼';
         });
 
         tableBody.appendChild(tr);
         tableBody.appendChild(detailsRow);
     });
 }
-
 
 async function loadGalleryPage() {
     if (isLoading) return;
@@ -116,6 +120,8 @@ function renderGallery(songs) {
         card.className = 'card';
 
         card.innerHTML = `
+            <img src="/api/songs/${song.index}/cover?seed=${state.seed}"
+                style="width:100%;margin-bottom:8px;"/>
             <h4>${song.title}</h4>
             <small>${song.artist}</small><br/><br/>
             <strong>${song.album}</strong><br/>
@@ -143,51 +149,26 @@ function resetAndReload() {
     loadSongs();
 }
 
+
 languageSelect.addEventListener('change', e => {
     state.language = e.target.value;
-
-    if (viewMode === VIEW.GALLERY) {
-        resetGallery();
-        loadGalleryPage();
-    } else {
-        resetAndReload();
-    }
+    viewMode === VIEW.GALLERY ? resetGallery() || loadGalleryPage() : resetAndReload();
 });
-
 
 seedInput.addEventListener('input', e => {
     const value = e.target.value.trim();
-
-    if (value === '') {
-        return;
-    }
+    if (value === '') return;
 
     const parsed = Number(value);
-
-    if (Number.isNaN(parsed)) {
-        return;
-    }
+    if (Number.isNaN(parsed)) return;
 
     state.seed = parsed;
-
-    if (viewMode === VIEW.GALLERY) {
-        resetGallery();
-        loadGalleryPage();
-    } else {
-        resetAndReload();
-    }
+    viewMode === VIEW.GALLERY ? resetGallery() || loadGalleryPage() : resetAndReload();
 });
-
 
 likesInput.addEventListener('change', e => {
     state.avgLikes = Number(e.target.value) || 0;
-
-    if (viewMode === VIEW.GALLERY) {
-        resetGallery();
-        loadGalleryPage();
-    } else {
-        loadSongs();
-    }
+    viewMode === VIEW.GALLERY ? resetGallery() || loadGalleryPage() : loadSongs();
 });
 
 randomSeedBtn.addEventListener('click', () => {
@@ -213,6 +194,7 @@ toggleViewBtn.addEventListener('click', () => {
     if (viewMode === VIEW.TABLE) {
         viewMode = VIEW.GALLERY;
         toggleViewBtn.textContent = 'Table';
+
         tableEl.classList.add('hidden');
         galleryEl.classList.remove('hidden');
 
@@ -225,15 +207,11 @@ toggleViewBtn.addEventListener('click', () => {
         galleryEl.classList.add('hidden');
         tableEl.classList.remove('hidden');
 
-        document.body.style.height = 'auto';
-        document.documentElement.style.height = 'auto';
         window.scrollTo(0, 0);
-
         resetAndReload();
     }
 });
 
-//INFINITE SCROLL FOR GALLERY VIEW
 window.addEventListener('scroll', () => {
     if (viewMode !== VIEW.GALLERY) return;
 

@@ -90,3 +90,14 @@ audio {
 .gallery.hidden {
     display: none;
 }
+
+.accordion-cell {
+    text-align: center;
+    cursor: pointer;
+    width: 40px;
+}
+
+.accordion-icon {
+    font-size: 14px;
+    user-select: none;
+}

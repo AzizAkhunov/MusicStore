@@ -42,5 +42,39 @@ namespace MusicStore.Controllers
 
             return File(wav, "audio/wav", $"song_{id}.wav");
         }
+
+        [HttpGet("{index}/cover")]
+        public IActionResult GetCover(int index, [FromQuery] long seed = 1)
+        {
+            var random = new Random((int)((seed + index * 7919) % int.MaxValue));
+
+            string Color() =>
+                $"{random.Next(50, 200):X2}{random.Next(50, 200):X2}{random.Next(50, 200):X2}";
+
+            var color1 = Color();
+            var color2 = Color();
+
+            var svg = $@"
+                <svg xmlns='http://www.w3.org/2000/svg' width='300' height='300'>
+                <defs>
+                <linearGradient id='g' x1='0' y1='0' x2='1' y2='1'>
+                <stop offset='0%' stop-color='#{color1}'/>
+                <stop offset='100%' stop-color='#{color2}'/>
+                </linearGradient>
+                </defs>
+                <rect width='300' height='300' fill='url(#g)'/>
+                <text x='150' y='175'
+                    font-size='96'
+                    text-anchor='middle'
+                    fill='white'
+                    font-family='Arial, sans-serif'
+                    opacity='0.85'>
+                {index}
+                </text>
+            </svg>";
+
+            return Content(svg, "image/svg+xml");
+        }
+
     }
 }

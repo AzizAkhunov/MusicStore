@@ -11,20 +11,46 @@ namespace MusicStore.Services
             const short bitsPerSample = 16;
             const short channels = 1;
 
-            int samples = sampleRate * durationSeconds;
+            int totalSamples = sampleRate * durationSeconds;
+
             var random = new Random((int)((seed + songIndex * 997) % int.MaxValue));
 
-            double frequency = 220 + random.Next(0,400);
-            short[] buffer = new short[samples];
-
-            for (int i = 0; i< samples; i++)
+            // 🎵 Набор нот (простая гамма)
+            double[] scale = new[]
             {
+                220.0, // A3
+                246.94, // B3
+                261.63, // C4
+                293.66, // D4
+                329.63, // E4
+                392.00  // G4
+            };
+
+            double[] melody = new double[6];
+            for (int i = 0; i < melody.Length; i++)
+            {
+                melody[i] = scale[random.Next(scale.Length)];
+            }
+
+            int noteLength = totalSamples / melody.Length;
+            short[] buffer = new short[totalSamples];
+
+            for (int i = 0; i < totalSamples; i++)
+            {
+                int noteIndex = Math.Min(i / noteLength, melody.Length - 1);
+                double freq = melody[noteIndex];
+
                 double t = (double)i / sampleRate;
-                buffer[i] = (short) (Math.Sin(2 * Math.PI * frequency * t) * short.MaxValue * 0.3);
+                buffer[i] = (short)(
+                    Math.Sin(2 * Math.PI * freq * t) *
+                    short.MaxValue *
+                    0.35
+                );
             }
 
             return BuildWav(buffer, sampleRate, bitsPerSample, channels);
         }
+
         private byte[] BuildWav(short[] samples, int sampleRate, short bitsPerSample, short channels)
         {
             int byteRate = sampleRate * channels * bitsPerSample / 8;
