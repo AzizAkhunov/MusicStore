@@ -156,9 +156,28 @@ languageSelect.addEventListener('change', e => {
 
 
 seedInput.addEventListener('input', e => {
-    state.seed = e.target.value;
-    viewMode === VIEW.GALLERY ? resetGallery() || loadGalleryPage() : resetAndReload();
+    const value = e.target.value.trim();
+
+    if (value === '') {
+        return;
+    }
+
+    const parsed = Number(value);
+
+    if (Number.isNaN(parsed)) {
+        return;
+    }
+
+    state.seed = parsed;
+
+    if (viewMode === VIEW.GALLERY) {
+        resetGallery();
+        loadGalleryPage();
+    } else {
+        resetAndReload();
+    }
 });
+
 
 likesInput.addEventListener('change', e => {
     state.avgLikes = Number(e.target.value) || 0;
